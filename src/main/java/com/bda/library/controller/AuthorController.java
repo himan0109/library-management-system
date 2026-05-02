@@ -2,7 +2,6 @@ package com.bda.library.controller;
 
 import com.bda.library.entity.Author;
 import com.bda.library.service.AuthorService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,24 +10,23 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 @RequestMapping("/authors")
-@RequiredArgsConstructor
 public class AuthorController {
 
     private final AuthorService authorService;
 
-    // ── READ: list all authors ────────────────────────────────────────────────
+    public AuthorController(AuthorService authorService) {
+        this.authorService = authorService;
+    }
+
     @GetMapping
     public String list(Model model) {
-        List<Author> authors = authorService.findAll();
-        model.addAttribute("authors", authors);
+        model.addAttribute("authors", authorService.findAll());
         return "authors/list";
     }
 
-    // ── CREATE: show form ─────────────────────────────────────────────────────
     @GetMapping("/new")
     public String newAuthorForm(Model model) {
         model.addAttribute("author", new Author());
@@ -37,7 +35,6 @@ public class AuthorController {
         return "authors/form";
     }
 
-    // ── CREATE: handle submission ─────────────────────────────────────────────
     @PostMapping
     public String createAuthor(@Valid @ModelAttribute("author") Author author,
                                BindingResult bindingResult,
@@ -60,7 +57,6 @@ public class AuthorController {
         return "redirect:/authors";
     }
 
-    // ── UPDATE: show pre-filled form ──────────────────────────────────────────
     @GetMapping("/{id}/edit")
     public String editAuthorForm(@PathVariable Long id, Model model) {
         Author author = authorService.findById(id)
@@ -71,7 +67,6 @@ public class AuthorController {
         return "authors/form";
     }
 
-    // ── UPDATE: handle submission ─────────────────────────────────────────────
     @PostMapping("/{id}/update")
     public String updateAuthor(@PathVariable Long id,
                                @Valid @ModelAttribute("author") Author author,

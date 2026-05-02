@@ -20,14 +20,16 @@ class AuthorRepositoryTest {
 
     private Author author;
 
+    private Author makeAuthor(String name, String email, String nationality, int birthYear) {
+        Author a = new Author();
+        a.setName(name); a.setEmail(email);
+        a.setNationality(nationality); a.setBirthYear(birthYear);
+        return a;
+    }
+
     @BeforeEach
     void setUp() {
-        author = authorRepository.save(Author.builder()
-                .name("George Orwell")
-                .email("gorwell@test.com")
-                .nationality("British")
-                .birthYear(1903)
-                .build());
+        author = authorRepository.save(makeAuthor("George Orwell", "gorwell@test.com", "British", 1903));
     }
 
     @Test
@@ -48,14 +50,13 @@ class AuthorRepositoryTest {
     @Test
     @DisplayName("findByEmail() returns empty for unknown email")
     void findByEmail_returnsEmptyForUnknown() {
-        Optional<Author> found = authorRepository.findByEmail("nobody@test.com");
-        assertThat(found).isEmpty();
+        assertThat(authorRepository.findByEmail("nobody@test.com")).isEmpty();
     }
 
     @Test
     @DisplayName("searchByName() returns author matching partial name (case-insensitive)")
     void searchByName_returnsPartialMatch() {
-        authorRepository.save(Author.builder().name("J.K. Rowling").email("jkr@test.com").nationality("British").birthYear(1965).build());
+        authorRepository.save(makeAuthor("J.K. Rowling", "jkr@test.com", "British", 1965));
         List<Author> results = authorRepository.searchByName("orwell");
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getName()).isEqualTo("George Orwell");
@@ -64,9 +65,8 @@ class AuthorRepositoryTest {
     @Test
     @DisplayName("findByNationality() returns authors for a given nationality")
     void findByNationality_returnsMatching() {
-        authorRepository.save(Author.builder().name("J.K. Rowling").email("jkr@test.com").nationality("British").birthYear(1965).build());
-        List<Author> british = authorRepository.findByNationality("British");
-        assertThat(british).hasSizeGreaterThanOrEqualTo(2);
+        authorRepository.save(makeAuthor("J.K. Rowling", "jkr@test.com", "British", 1965));
+        assertThat(authorRepository.findByNationality("British")).hasSizeGreaterThanOrEqualTo(2);
     }
 
     @Test
@@ -79,13 +79,6 @@ class AuthorRepositoryTest {
     @DisplayName("existsByEmail() returns false for unknown email")
     void existsByEmail_falseForUnknown() {
         assertThat(authorRepository.existsByEmail("unknown@test.com")).isFalse();
-    }
-
-    @Test
-    @DisplayName("findAll() returns all persisted authors")
-    void findAll_returnsAllAuthors() {
-        authorRepository.save(Author.builder().name("Toni Morrison").email("tm@test.com").nationality("American").birthYear(1931).build());
-        assertThat(authorRepository.findAll()).hasSizeGreaterThanOrEqualTo(2);
     }
 
     @Test

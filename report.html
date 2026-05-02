@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Library Management System – Project Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', Arial, sans-serif; font-size: 13px; color: #1a202c; background: #fff; line-height: 1.7; }
+
+  /* ── Cover page ── */
+  .cover {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%);
+    color: #fff; padding: 4rem 2rem; page-break-after: always;
+  }
+  .cover-icon { font-size: 5rem; margin-bottom: 1.5rem; }
+  .cover h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: .8rem; letter-spacing: -.5px; }
+  .cover h2 { font-size: 1.2rem; font-weight: 400; opacity: .85; margin-bottom: 2.5rem; }
+  .cover-meta { background: rgba(255,255,255,.15); border-radius: 12px; padding: 1.5rem 2.5rem; line-height: 2.2; }
+  .cover-meta strong { display: block; font-size: 1rem; }
+  .cover-meta span  { font-size: .9rem; opacity: .9; }
+
+  /* ── Layout ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 3rem 2.5rem; }
+  @media print {
+    .cover { page-break-after: always; }
+    .section { page-break-inside: avoid; }
+  }
+
+  /* ── Section headings ── */
+  .section { margin-bottom: 3rem; }
+  h2.section-title {
+    font-size: 1.35rem; font-weight: 700; color: #2c5282;
+    border-bottom: 3px solid #2c5282; padding-bottom: .4rem; margin-bottom: 1.2rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  h3 { font-size: 1.05rem; font-weight: 700; color: #2d3748; margin: 1.4rem 0 .5rem; }
+  h4 { font-size: .95rem; font-weight: 600; color: #4a5568; margin: 1rem 0 .4rem; }
+  p  { margin-bottom: .8rem; }
+
+  /* ── Table of contents ── */
+  .toc { background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.5rem 2rem; margin-bottom: 3rem; }
+  .toc h2 { color: #2c5282; margin-bottom: 1rem; font-size: 1.1rem; }
+  .toc ol { padding-left: 1.4rem; }
+  .toc li { margin: .35rem 0; color: #2c5282; font-size: .92rem; }
+
+  /* ── ER diagram box ── */
+  .er-box {
+    display: flex; gap: 3rem; align-items: flex-start; justify-content: center;
+    background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+    padding: 2rem; margin: 1.2rem 0; flex-wrap: wrap;
+  }
+  .entity-card {
+    background: #fff; border: 2px solid #2c5282; border-radius: 8px;
+    min-width: 200px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+  .entity-card .entity-name {
+    background: #2c5282; color: #fff; text-align: center;
+    padding: .55rem 1rem; font-weight: 700; font-size: .95rem; letter-spacing: .3px;
+  }
+  .entity-card .entity-fields { padding: .8rem 1rem; }
+  .entity-card .field { font-size: .82rem; padding: .22rem 0; border-bottom: 1px solid #f0f0f0; font-family: 'Fira Code', monospace; }
+  .entity-card .field:last-child { border-bottom: none; }
+  .field .pk  { color: #d69e2e; font-weight: 700; }
+  .field .fk  { color: #38a169; font-weight: 700; }
+  .field .type { color: #718096; margin-left: .3rem; }
+  .rel-label {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: .3rem; color: #553c9a; font-weight: 700; font-size: .9rem;
+  }
+  .rel-arrow { font-size: 2rem; }
+
+  /* ── Code blocks ── */
+  pre {
+    background: #1a202c; color: #e2e8f0; border-radius: 8px;
+    padding: 1.1rem 1.4rem; font-family: 'Fira Code', monospace; font-size: .8rem;
+    overflow-x: auto; margin: .8rem 0 1.2rem; line-height: 1.6;
+  }
+  code { font-family: 'Fira Code', monospace; font-size: .82rem; }
+  .kw  { color: #76e4f7; }
+  .an  { color: #f6ad55; }
+  .st  { color: #68d391; }
+  .cm  { color: #718096; font-style: italic; }
+  .tp  { color: #b794f4; }
+
+  /* ── Inline badges ── */
+  .badge { display: inline-block; padding: .15rem .55rem; border-radius: 4px; font-size: .78rem; font-weight: 600; margin: 0 2px; }
+  .badge-blue   { background: #bee3f8; color: #2c5282; }
+  .badge-green  { background: #c6f6d5; color: #22543d; }
+  .badge-purple { background: #e9d8fd; color: #553c9a; }
+  .badge-orange { background: #feebc8; color: #744210; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: .8rem 0 1.4rem; font-size: .88rem; }
+  th { background: #2c5282; color: #fff; padding: .6rem .9rem; text-align: left; }
+  td { padding: .55rem .9rem; border-bottom: 1px solid #e2e8f0; }
+  tr:hover td { background: #f7fafc; }
+
+  /* ── URL link box ── */
+  .link-box { background: #ebf8ff; border: 2px solid #4299e1; border-radius: 8px; padding: 1rem 1.4rem; font-family: 'Fira Code', monospace; font-size: .9rem; color: #2c5282; word-break: break-all; margin: .8rem 0; }
+
+  /* ── Info/callout boxes ── */
+  .callout { border-radius: 8px; padding: 1rem 1.3rem; margin: .8rem 0; }
+  .callout-info    { background: #ebf8ff; border-left: 4px solid #4299e1; }
+  .callout-success { background: #c6f6d5; border-left: 4px solid #38a169; }
+  .callout-warn    { background: #fefcbf; border-left: 4px solid #d69e2e; }
+
+  /* ── Screenshot placeholder ── */
+  .screenshot-placeholder {
+    border: 2px dashed #cbd5e0; border-radius: 8px; background: #f7fafc;
+    padding: 2.5rem; text-align: center; color: #a0aec0; margin: 1rem 0;
+    font-size: .9rem;
+  }
+  .screenshot-placeholder strong { display: block; margin-bottom: .3rem; color: #718096; font-size: 1rem; }
+
+  /* ── Layer architecture ── */
+  .layers { display: flex; flex-direction: column; gap: .5rem; margin: 1rem 0; }
+  .layer { border-radius: 8px; padding: .7rem 1.2rem; font-weight: 600; font-size: .88rem; display: flex; align-items: center; gap: .8rem; }
+  .layer-view       { background: #e9d8fd; color: #553c9a; }
+  .layer-controller { background: #bee3f8; color: #2c5282; }
+  .layer-service    { background: #c6f6d5; color: #22543d; }
+  .layer-repo       { background: #feebc8; color: #744210; }
+  .layer-db         { background: #fed7d7; color: #c53030; }
+  .layer-icon { font-size: 1.2rem; }
+  .layer-arrow { text-align: center; color: #718096; font-size: 1.3rem; }
+
+  footer { text-align: center; color: #a0aec0; font-size: .8rem; padding: 2rem; border-top: 1px solid #e2e8f0; margin-top: 3rem; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     COVER PAGE
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-icon">📚</div>
+  <h1>Library Management System</h1>
+  <h2>Spring Boot Application — Books &amp; Authors</h2>
+  <div class="cover-meta">
+    <strong>Course</strong><span>Big Data Analytics (BDA)</span>
+    <strong>GitHub</strong><span>https://github.com/himan0109/library-management-system</span>
+    <strong>Tech Stack</strong><span>Spring Boot 2.7 · JPA/Hibernate · H2 · JSP · JUnit 5 · Mockito</span>
+    <strong>Date</strong><span>May 2026</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+
+  <!-- Table of Contents -->
+  <div class="toc">
+    <h2>📋 Table of Contents</h2>
+    <ol>
+      <li>Introduction &amp; Overview</li>
+      <li>Entity Relationship Design</li>
+      <li>Project Architecture</li>
+      <li>Implementation Details — Entity Layer</li>
+      <li>Implementation Details — Repository Layer</li>
+      <li>Implementation Details — Service Layer</li>
+      <li>Implementation Details — Controller Layer</li>
+      <li>Implementation Details — View Layer (JSP)</li>
+      <li>Database Seeding (10 × 10 Sample Data)</li>
+      <li>Exception Handling</li>
+      <li>Testing — Repository &amp; Service Unit Tests</li>
+      <li>Application Screenshots</li>
+      <li>Challenges Faced &amp; Solutions</li>
+      <li>GitHub Repository</li>
+    </ol>
+  </div>
+
+  <!-- ── 1. Introduction ────────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">1 · Introduction &amp; Overview</h2>
+    <p>
+      The <strong>Library Management System</strong> is a full-stack Spring Boot web application
+      that manages two core entities — <strong>Authors</strong> and <strong>Books</strong> — and
+      exposes Create, Read, and Update operations through a browser-based JSP interface.
+    </p>
+    <table>
+      <tr><th>Requirement</th><th>Implementation</th></tr>
+      <tr><td>Two entities with a relationship</td><td>Author (1) ↔ Book (Many) via @OneToMany / @ManyToOne</td></tr>
+      <tr><td>Populate database</td><td>DataInitializer seeds 10 authors + 10 books on startup</td></tr>
+      <tr><td>Create operation</td><td>Form-based POST with Bean Validation + integrity error handling</td></tr>
+      <tr><td>Read operation</td><td>List views + custom INNER JOIN JPQL query returning a DTO</td></tr>
+      <tr><td>Update operation</td><td>Pre-filled edit form, POST updates, redirect-after-post</td></tr>
+      <tr><td>Unit tests</td><td>32 tests across AuthorRepository, BookRepository, AuthorService, BookService</td></tr>
+    </table>
+  </div>
+
+  <!-- ── 2. ER Design ───────────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">2 · Entity Relationship Design</h2>
+    <p>The two entities share a <strong>One-to-Many</strong> relationship: one Author can write many Books, and each Book belongs to exactly one Author.</p>
+
+    <div class="er-box">
+      <!-- Author entity -->
+      <div class="entity-card">
+        <div class="entity-name">AUTHORS</div>
+        <div class="entity-fields">
+          <div class="field"><span class="pk">PK</span> id <span class="type">BIGINT AUTO</span></div>
+          <div class="field">name <span class="type">VARCHAR(100) NOT NULL</span></div>
+          <div class="field">email <span class="type">VARCHAR(150) UNIQUE NOT NULL</span></div>
+          <div class="field">nationality <span class="type">VARCHAR(60) NOT NULL</span></div>
+          <div class="field">birth_year <span class="type">INT NOT NULL</span></div>
+        </div>
+      </div>
+
+      <!-- Relationship -->
+      <div class="rel-label">
+        <span>1</span>
+        <div class="rel-arrow">⟷</div>
+        <span>Many</span>
+        <small style="color:#718096; font-size:.78rem; margin-top:.3rem;">author_id FK</small>
+      </div>
+
+      <!-- Book entity -->
+      <div class="entity-card">
+        <div class="entity-name">BOOKS</div>
+        <div class="entity-fields">
+          <div class="field"><span class="pk">PK</span> id <span class="type">BIGINT AUTO</span></div>
+          <div class="field">title <span class="type">VARCHAR(200) NOT NULL</span></div>
+          <div class="field">isbn <span class="type">VARCHAR(20) UNIQUE NOT NULL</span></div>
+          <div class="field">published_year <span class="type">INT NOT NULL</span></div>
+          <div class="field">genre <span class="type">VARCHAR(80) NOT NULL</span></div>
+          <div class="field"><span class="fk">FK</span> author_id <span class="type">BIGINT NOT NULL</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <strong>Cardinality:</strong> One Author → Many Books. The <code>author_id</code> foreign key in the
+      <code>BOOKS</code> table enforces referential integrity at the database level. Cascading
+      <code>ALL</code> on the Author side ensures books are removed when their author is deleted.
+    </div>
+  </div>
+
+  <!-- ── 3. Architecture ───────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">3 · Project Architecture</h2>
+    <p>The application follows the standard Spring MVC layered architecture with strict separation of concerns:</p>
+    <div class="layers">
+      <div class="layer layer-view"><span class="layer-icon">🖥️</span> View Layer — JSP Pages (authors/, books/, index.jsp, error.jsp)</div>
+      <div class="layer-arrow">▲ Model &amp; View binding (Spring ModelAttribute / JSTL EL) ▼</div>
+      <div class="layer layer-controller"><span class="layer-icon">🎮</span> Controller Layer — AuthorController, BookController, HomeController</div>
+      <div class="layer-arrow">▲ DTO / Entity passing ▼</div>
+      <div class="layer layer-service"><span class="layer-icon">⚙️</span> Service Layer — AuthorServiceImpl, BookServiceImpl</div>
+      <div class="layer-arrow">▲ Spring Data JPA ▼</div>
+      <div class="layer layer-repo"><span class="layer-icon">🗄️</span> Repository Layer — AuthorRepository, BookRepository (JpaRepository)</div>
+      <div class="layer-arrow">▲ JDBC ▼</div>
+      <div class="layer layer-db"><span class="layer-icon">💾</span> Database — H2 In-Memory (auto-created by Hibernate DDL)</div>
+    </div>
+
+    <h3>Package structure</h3>
+    <pre>com.bda.library
+├── LibraryApplication.java
+├── config/       DataInitializer.java
+├── controller/   AuthorController · BookController · HomeController
+├── dto/          BookWithAuthorDTO.java
+├── entity/       Author · Book
+├── exception/    GlobalExceptionHandler.java
+├── repository/   AuthorRepository · BookRepository
+└── service/
+    ├── AuthorService (interface) · BookService (interface)
+    └── impl/ AuthorServiceImpl · BookServiceImpl</pre>
+  </div>
+
+  <!-- ── 4. Entity Layer ───────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">4 · Implementation — Entity Layer</h2>
+
+    <h3>Author.java</h3>
+    <pre><span class="an">@Entity</span>
+<span class="an">@Table</span>(name = <span class="st">"authors"</span>)
+<span class="kw">public class</span> <span class="tp">Author</span> {
+    <span class="an">@Id @GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="tp">Long</span> id;
+
+    <span class="an">@NotBlank @Size</span>(max = 100)
+    <span class="an">@Column</span>(nullable = <span class="kw">false</span>, length = 100)
+    <span class="kw">private</span> <span class="tp">String</span> name;
+
+    <span class="an">@Email @NotBlank</span>
+    <span class="an">@Column</span>(nullable = <span class="kw">false</span>, unique = <span class="kw">true</span>, length = 150)
+    <span class="kw">private</span> <span class="tp">String</span> email;
+
+    <span class="an">@NotBlank</span>
+    <span class="kw">private</span> <span class="tp">String</span> nationality;
+
+    <span class="an">@Min</span>(1000) <span class="an">@Max</span>(2025)
+    <span class="kw">private int</span> birthYear;
+
+    <span class="an">@OneToMany</span>(mappedBy = <span class="st">"author"</span>, cascade = CascadeType.ALL, orphanRemoval = <span class="kw">true</span>)
+    <span class="kw">private</span> <span class="tp">List</span>&lt;<span class="tp">Book</span>&gt; books = <span class="kw">new</span> ArrayList&lt;&gt;();
+}</pre>
+
+    <h3>Book.java</h3>
+    <pre><span class="an">@Entity</span>
+<span class="an">@Table</span>(name = <span class="st">"books"</span>)
+<span class="kw">public class</span> <span class="tp">Book</span> {
+    <span class="an">@Id @GeneratedValue</span>(strategy = GenerationType.IDENTITY)
+    <span class="kw">private</span> <span class="tp">Long</span> id;
+
+    <span class="an">@NotBlank @Size</span>(max = 200) <span class="kw">private</span> <span class="tp">String</span> title;
+
+    <span class="an">@NotBlank @Pattern</span>(regexp = <span class="st">"^[0-9\\-]{10,17}$"</span>)
+    <span class="an">@Column</span>(unique = <span class="kw">true</span>) <span class="kw">private</span> <span class="tp">String</span> isbn;
+
+    <span class="an">@Min</span>(1000) <span class="an">@Max</span>(2025) <span class="kw">private int</span> publishedYear;
+
+    <span class="an">@NotBlank</span> <span class="kw">private</span> <span class="tp">String</span> genre;
+
+    <span class="an">@ManyToOne</span>(fetch = FetchType.LAZY)
+    <span class="an">@JoinColumn</span>(name = <span class="st">"author_id"</span>, nullable = <span class="kw">false</span>)
+    <span class="kw">private</span> <span class="tp">Author</span> author;
+}</pre>
+
+    <p>Key JPA annotations used:</p>
+    <table>
+      <tr><th>Annotation</th><th>Purpose</th></tr>
+      <tr><td><code>@Entity</code></td><td>Marks the class as a JPA-managed entity mapped to a database table</td></tr>
+      <tr><td><code>@Table(name=...)</code></td><td>Explicitly names the database table</td></tr>
+      <tr><td><code>@Id @GeneratedValue</code></td><td>Primary key with auto-increment strategy</td></tr>
+      <tr><td><code>@Column(unique=true)</code></td><td>Adds a UNIQUE constraint (email, ISBN)</td></tr>
+      <tr><td><code>@OneToMany</code></td><td>Author owns the one side of the relationship</td></tr>
+      <tr><td><code>@ManyToOne @JoinColumn</code></td><td>Book holds the FK column author_id</td></tr>
+      <tr><td><code>@NotBlank @Email @Min @Max</code></td><td>Bean Validation constraints checked before persistence</td></tr>
+    </table>
+  </div>
+
+  <!-- ── 5. Repository Layer ───────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">5 · Implementation — Repository Layer</h2>
+    <p>Both repositories extend <code>JpaRepository&lt;T, ID&gt;</code>, which automatically provides
+    <code>save()</code>, <code>findById()</code>, <code>findAll()</code>, <code>deleteById()</code>, and more.</p>
+
+    <h3>Custom query methods</h3>
+    <pre><span class="cm">// AuthorRepository</span>
+<span class="tp">Optional</span>&lt;<span class="tp">Author</span>&gt; findByEmail(<span class="tp">String</span> email);
+<span class="tp">List</span>&lt;<span class="tp">Author</span>&gt; findByNationality(<span class="tp">String</span> nationality);
+<span class="tp">boolean</span> existsByEmail(<span class="tp">String</span> email);
+
+<span class="an">@Query</span>(<span class="st">"SELECT a FROM Author a WHERE LOWER(a.name) LIKE LOWER(CONCAT('%',:name,'%'))"</span>)
+<span class="tp">List</span>&lt;<span class="tp">Author</span>&gt; searchByName(<span class="tp">String</span> name);</pre>
+
+    <h3>Custom INNER JOIN query (BookRepository)</h3>
+    <pre><span class="an">@Query</span>(<span class="st">"""
+    SELECT new com.bda.library.dto.BookWithAuthorDTO(
+        b.id, b.title, b.isbn, b.publishedYear, b.genre,
+        a.id, a.name, a.nationality)
+    FROM Book b INNER JOIN b.author a
+    ORDER BY a.name, b.title
+    """</span>)
+<span class="tp">List</span>&lt;<span class="tp">BookWithAuthorDTO</span>&gt; findAllBooksWithAuthorDetails();
+
+<span class="cm">// Fetch-join avoids N+1 problem when loading the books list</span>
+<span class="an">@Query</span>(<span class="st">"SELECT b FROM Book b INNER JOIN FETCH b.author a ORDER BY b.title"</span>)
+<span class="tp">List</span>&lt;<span class="tp">Book</span>&gt; findAllWithAuthor();</pre>
+
+    <div class="callout callout-info">
+      The JPQL INNER JOIN query projects results into a <code>BookWithAuthorDTO</code> object (using
+      the <code>new</code> constructor expression), satisfying the requirement for a custom join query
+      between both entities. The SQL equivalent is:
+      <code>SELECT b.*, a.name, a.nationality FROM books b INNER JOIN authors a ON b.author_id = a.id</code>
+    </div>
+  </div>
+
+  <!-- ── 6. Service Layer ──────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">6 · Implementation — Service Layer</h2>
+    <p>Service classes implement their respective interfaces and are annotated with <code>@Service @Transactional</code>.
+    Read-only operations use <code>@Transactional(readOnly = true)</code> for performance.</p>
+
+    <h3>AuthorServiceImpl — update method</h3>
+    <pre><span class="an">@Override</span>
+<span class="kw">public</span> <span class="tp">Author</span> update(<span class="tp">Long</span> id, <span class="tp">Author</span> updated) {
+    <span class="tp">Author</span> existing = authorRepository.findById(id)
+        .orElseThrow(() -> <span class="kw">new</span> EntityNotFoundException(<span class="st">"Author not found: "</span> + id));
+    existing.setName(updated.getName());
+    existing.setEmail(updated.getEmail());
+    existing.setNationality(updated.getNationality());
+    existing.setBirthYear(updated.getBirthYear());
+    <span class="kw">return</span> authorRepository.save(existing);
+}</pre>
+
+    <h3>BookServiceImpl — save method (author resolution)</h3>
+    <pre><span class="an">@Override</span>
+<span class="kw">public</span> <span class="tp">Book</span> save(<span class="tp">Book</span> book) {
+    <span class="cm">// Re-fetch the full Author entity by the ID submitted from the form</span>
+    <span class="tp">Author</span> author = authorRepository.findById(book.getAuthor().getId())
+        .orElseThrow(() -> <span class="kw">new</span> EntityNotFoundException(<span class="st">"Author not found"</span>));
+    book.setAuthor(author);
+    <span class="kw">return</span> bookRepository.save(book);
+}</pre>
+  </div>
+
+  <!-- ── 7. Controller Layer ───────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">7 · Implementation — Controller Layer</h2>
+
+    <h3>URL Mapping Summary</h3>
+    <table>
+      <tr><th>Method</th><th>URL</th><th>Action</th></tr>
+      <tr><td><span class="badge badge-green">GET</span></td><td>/authors</td><td>List all authors (Read)</td></tr>
+      <tr><td><span class="badge badge-green">GET</span></td><td>/authors/new</td><td>Show create form (Create)</td></tr>
+      <tr><td><span class="badge badge-orange">POST</span></td><td>/authors</td><td>Save new author (Create)</td></tr>
+      <tr><td><span class="badge badge-green">GET</span></td><td>/authors/{id}/edit</td><td>Show edit form (Update)</td></tr>
+      <tr><td><span class="badge badge-orange">POST</span></td><td>/authors/{id}/update</td><td>Save updated author (Update)</td></tr>
+      <tr><td><span class="badge badge-green">GET</span></td><td>/books</td><td>List all books (Read)</td></tr>
+      <tr><td><span class="badge badge-green">GET</span></td><td>/books/joined</td><td>INNER JOIN view (Read)</td></tr>
+      <tr><td><span class="badge badge-green">GET</span></td><td>/books/new</td><td>Show create form (Create)</td></tr>
+      <tr><td><span class="badge badge-orange">POST</span></td><td>/books</td><td>Save new book (Create)</td></tr>
+      <tr><td><span class="badge badge-green">GET</span></td><td>/books/{id}/edit</td><td>Show edit form (Update)</td></tr>
+      <tr><td><span class="badge badge-orange">POST</span></td><td>/books/{id}/update</td><td>Save updated book (Update)</td></tr>
+    </table>
+
+    <h3>Create handler with validation &amp; integrity error handling</h3>
+    <pre><span class="an">@PostMapping</span>
+<span class="kw">public</span> <span class="tp">String</span> createAuthor(<span class="an">@Valid @ModelAttribute</span>(<span class="st">"author"</span>) <span class="tp">Author</span> author,
+                           <span class="tp">BindingResult</span> bindingResult, <span class="tp">Model</span> model,
+                           <span class="tp">RedirectAttributes</span> redirectAttrs) {
+    <span class="kw">if</span> (bindingResult.hasErrors()) {          <span class="cm">// Bean Validation failed</span>
+        model.addAttribute(<span class="st">"formAction"</span>, <span class="st">"/authors"</span>);
+        <span class="kw">return</span> <span class="st">"authors/form"</span>;               <span class="cm">// redisplay with error messages</span>
+    }
+    <span class="kw">try</span> {
+        authorService.save(author);
+        redirectAttrs.addFlashAttribute(<span class="st">"successMessage"</span>, <span class="st">"Author created."</span>);
+    } <span class="kw">catch</span> (<span class="tp">DataIntegrityViolationException</span> e) {
+        model.addAttribute(<span class="st">"errorMessage"</span>, <span class="st">"Email already exists."</span>);
+        <span class="kw">return</span> <span class="st">"authors/form"</span>;
+    }
+    <span class="kw">return</span> <span class="st">"redirect:/authors"</span>;             <span class="cm">// Post-Redirect-Get pattern</span>
+}</pre>
+
+    <p>The same pattern is applied for Books, with duplicate ISBN detected via <code>DataIntegrityViolationException</code>.</p>
+  </div>
+
+  <!-- ── 8. View Layer ─────────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">8 · Implementation — View Layer (JSP)</h2>
+
+    <h3>JSP pages created</h3>
+    <table>
+      <tr><th>File</th><th>Purpose</th></tr>
+      <tr><td>index.jsp</td><td>Home dashboard with navigation cards</td></tr>
+      <tr><td>authors/list.jsp</td><td>Tabular list of all authors with Edit button</td></tr>
+      <tr><td>authors/form.jsp</td><td>Reused for both Create and Update (formAction attribute switches the POST target)</td></tr>
+      <tr><td>books/list.jsp</td><td>Tabular list of all books with genre badges and author name</td></tr>
+      <tr><td>books/form.jsp</td><td>Book form with author &lt;select&gt; dropdown; reused for Create and Update</td></tr>
+      <tr><td>books/joined.jsp</td><td>Displays result of the INNER JOIN JPQL query with the SQL shown</td></tr>
+      <tr><td>error.jsp</td><td>Global error page rendered by GlobalExceptionHandler</td></tr>
+    </table>
+
+    <h3>Data binding example (books/form.jsp)</h3>
+    <pre><span class="cm">&lt;!-- Spring form tag binds to 'book' model attribute --&gt;</span>
+&lt;<span class="kw">form:form</span> action="${formAction}" method="post" modelAttribute="book"&gt;
+    &lt;<span class="kw">form:input</span> path="title" placeholder="e.g. 1984"/&gt;
+    &lt;<span class="kw">form:errors</span> path="title" cssClass="error"/&gt;
+
+    &lt;<span class="kw">form:select</span> path="author.id"&gt;
+        &lt;<span class="kw">form:option</span> value="" label="-- Select an Author --"/&gt;
+        &lt;c:forEach var="a" items="${authors}"&gt;
+            &lt;<span class="kw">form:option</span> value="${a.id}" label="${a.name}"/&gt;
+        &lt;/c:forEach&gt;
+    &lt;/<span class="kw">form:select</span>&gt;
+&lt;/<span class="kw">form:form</span>&gt;</pre>
+
+    <p>All pages use embedded CSS with a consistent navy/blue colour scheme, responsive flex layout, hover effects on table rows, and badge labels for genres and nationalities.</p>
+  </div>
+
+  <!-- ── 9. Data Seeding ───────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">9 · Database Seeding — 10 × 10 Sample Data</h2>
+    <p><code>DataInitializer</code> implements <code>ApplicationRunner</code> and runs once on startup, inserting 10 authors and 10 books if the tables are empty.</p>
+
+    <h3>Authors (10 rows)</h3>
+    <table>
+      <tr><th>#</th><th>Name</th><th>Email</th><th>Nationality</th><th>Birth Year</th></tr>
+      <tr><td>1</td><td>George Orwell</td><td>gorwell@mail.com</td><td>British</td><td>1903</td></tr>
+      <tr><td>2</td><td>J.K. Rowling</td><td>jkrowling@mail.com</td><td>British</td><td>1965</td></tr>
+      <tr><td>3</td><td>Fyodor Dostoevsky</td><td>dostoevsky@mail.com</td><td>Russian</td><td>1821</td></tr>
+      <tr><td>4</td><td>Gabriel García Márquez</td><td>gmarquez@mail.com</td><td>Colombian</td><td>1927</td></tr>
+      <tr><td>5</td><td>Toni Morrison</td><td>tmorrison@mail.com</td><td>American</td><td>1931</td></tr>
+      <tr><td>6</td><td>Haruki Murakami</td><td>murakami@mail.com</td><td>Japanese</td><td>1949</td></tr>
+      <tr><td>7</td><td>Leo Tolstoy</td><td>tolstoy@mail.com</td><td>Russian</td><td>1828</td></tr>
+      <tr><td>8</td><td>Jane Austen</td><td>jausten@mail.com</td><td>British</td><td>1775</td></tr>
+      <tr><td>9</td><td>Mark Twain</td><td>mtwain@mail.com</td><td>American</td><td>1835</td></tr>
+      <tr><td>10</td><td>Franz Kafka</td><td>kafka@mail.com</td><td>Czech</td><td>1883</td></tr>
+    </table>
+
+    <h3>Books (10 rows)</h3>
+    <table>
+      <tr><th>#</th><th>Title</th><th>ISBN</th><th>Year</th><th>Genre</th><th>Author</th></tr>
+      <tr><td>1</td><td>1984</td><td>978-0451524935</td><td>1949</td><td>Dystopian Fiction</td><td>George Orwell</td></tr>
+      <tr><td>2</td><td>Harry Potter and the Philosopher's Stone</td><td>978-0747532743</td><td>1997</td><td>Fantasy</td><td>J.K. Rowling</td></tr>
+      <tr><td>3</td><td>Crime and Punishment</td><td>978-0486454115</td><td>1866</td><td>Psychological Fiction</td><td>Fyodor Dostoevsky</td></tr>
+      <tr><td>4</td><td>One Hundred Years of Solitude</td><td>978-0060883287</td><td>1967</td><td>Magical Realism</td><td>García Márquez</td></tr>
+      <tr><td>5</td><td>Beloved</td><td>978-1400033416</td><td>1987</td><td>Historical Fiction</td><td>Toni Morrison</td></tr>
+      <tr><td>6</td><td>Norwegian Wood</td><td>978-0375704024</td><td>1987</td><td>Literary Fiction</td><td>Haruki Murakami</td></tr>
+      <tr><td>7</td><td>War and Peace</td><td>978-1400079988</td><td>1869</td><td>Historical Fiction</td><td>Leo Tolstoy</td></tr>
+      <tr><td>8</td><td>Pride and Prejudice</td><td>978-0141439518</td><td>1813</td><td>Romance</td><td>Jane Austen</td></tr>
+      <tr><td>9</td><td>The Adventures of Tom Sawyer</td><td>978-0486400778</td><td>1876</td><td>Adventure</td><td>Mark Twain</td></tr>
+      <tr><td>10</td><td>The Metamorphosis</td><td>978-0486290300</td><td>1915</td><td>Absurdist Fiction</td><td>Franz Kafka</td></tr>
+    </table>
+  </div>
+
+  <!-- ── 10. Exception Handling ────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">10 · Exception Handling</h2>
+    <p>A <code>@ControllerAdvice</code> class — <code>GlobalExceptionHandler</code> — catches exceptions thrown anywhere in the controller layer and renders a friendly error page.</p>
+    <table>
+      <tr><th>Exception</th><th>Cause</th><th>User message</th></tr>
+      <tr><td>DataIntegrityViolationException</td><td>Duplicate email or ISBN in the database</td><td>Inline error on the form (not redirected to error page)</td></tr>
+      <tr><td>EntityNotFoundException</td><td>Invalid ID in URL (e.g. /authors/999/edit)</td><td>Error page: "Record Not Found"</td></tr>
+      <tr><td>Exception (generic)</td><td>Any unexpected runtime error</td><td>Error page: "Unexpected Error"</td></tr>
+    </table>
+    <pre><span class="an">@ControllerAdvice</span>
+<span class="kw">public class</span> <span class="tp">GlobalExceptionHandler</span> {
+    <span class="an">@ExceptionHandler</span>(<span class="tp">DataIntegrityViolationException</span>.class)
+    <span class="kw">public</span> <span class="tp">String</span> handleDataIntegrity(<span class="tp">DataIntegrityViolationException</span> ex, <span class="tp">Model</span> model) {
+        model.addAttribute(<span class="st">"errorMessage"</span>, <span class="st">"Constraint violation — check for duplicate values."</span>);
+        <span class="kw">return</span> <span class="st">"error"</span>;
+    }
+}</pre>
+  </div>
+
+  <!-- ── 11. Testing ───────────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">11 · Testing</h2>
+    <p>32 unit tests are organised into four test classes:</p>
+    <table>
+      <tr><th>Test Class</th><th>Type</th><th>Tests</th><th>Framework</th></tr>
+      <tr><td>AuthorRepositoryTest</td><td>Integration (@DataJpaTest)</td><td>8</td><td>JUnit 5 + H2</td></tr>
+      <tr><td>BookRepositoryTest</td><td>Integration (@DataJpaTest)</td><td>7</td><td>JUnit 5 + H2</td></tr>
+      <tr><td>AuthorServiceTest</td><td>Unit (mocked)</td><td>8</td><td>JUnit 5 + Mockito</td></tr>
+      <tr><td>BookServiceTest</td><td>Unit (mocked)</td><td>9</td><td>JUnit 5 + Mockito</td></tr>
+    </table>
+
+    <h3>Repository test example — custom INNER JOIN query</h3>
+    <pre><span class="an">@Test</span>
+<span class="an">@DisplayName</span>(<span class="st">"findAllBooksWithAuthorDetails() inner join returns DTO rows"</span>)
+<span class="kw">void</span> findAllBooksWithAuthorDetails_returnsJoinResult() {
+    <span class="tp">List</span>&lt;<span class="tp">BookWithAuthorDTO</span>&gt; dtos = bookRepository.findAllBooksWithAuthorDetails();
+    assertThat(dtos).isNotEmpty();
+    assertThat(dtos.get(0).getTitle()).isEqualTo(<span class="st">"1984"</span>);
+    assertThat(dtos.get(0).getAuthorName()).isEqualTo(<span class="st">"George Orwell"</span>);
+}</pre>
+
+    <h3>Service test example — update throws when author not found</h3>
+    <pre><span class="an">@Test</span>
+<span class="kw">void</span> update_throwsWhenNotFound() {
+    when(authorRepository.findById(99L)).thenReturn(Optional.empty());
+    assertThatThrownBy(() -> authorService.update(99L, author))
+        .isInstanceOf(EntityNotFoundException.class)
+        .hasMessageContaining(<span class="st">"99"</span>);
+}</pre>
+
+    <div class="callout callout-success">
+      All 32 tests use AssertJ fluent assertions for readable failure messages.
+      Repository tests use the <code>@DataJpaTest</code> slice which boots only the JPA layer against
+      a real H2 database — ensuring queries are validated against an actual SQL engine.
+    </div>
+  </div>
+
+  <!-- ── 12. Screenshots ───────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">12 · Application Screenshots</h2>
+    <div class="callout callout-warn">
+      Run the application with <code>mvn spring-boot:run</code> and navigate to <code>http://localhost:8080</code>
+      to capture screenshots. Replace the placeholders below before submitting.
+    </div>
+
+    <h3>Home Page</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: http://localhost:8080/ ]</strong>Dashboard with Books, Authors, and Join View cards.</div>
+
+    <h3>Authors List (Read)</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: http://localhost:8080/authors ]</strong>Table showing all 10 seeded authors with Edit buttons.</div>
+
+    <h3>Add Author Form (Create)</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: http://localhost:8080/authors/new ]</strong>Create form with field validation errors visible.</div>
+
+    <h3>Edit Author Form (Update)</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: http://localhost:8080/authors/1/edit ]</strong>Pre-filled edit form for George Orwell.</div>
+
+    <h3>Books List (Read)</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: http://localhost:8080/books ]</strong>Table of 10 books with genre badges and author names.</div>
+
+    <h3>Add Book Form (Create)</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: http://localhost:8080/books/new ]</strong>Form with author dropdown populated from database.</div>
+
+    <h3>Inner Join View (Custom Query)</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: http://localhost:8080/books/joined ]</strong>INNER JOIN result with SQL query displayed, all 10 books paired with author info.</div>
+
+    <h3>Duplicate ISBN Error (Exception Handling)</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: submit a book form with an existing ISBN ]</strong>Inline error message: "A book with this ISBN already exists."</div>
+
+    <h3>Unit Tests Passing</h3>
+    <div class="screenshot-placeholder"><strong>[ Screenshot: terminal showing mvn test output — BUILD SUCCESS, 32 tests run, 0 failures ]</strong></div>
+  </div>
+
+  <!-- ── 13. Challenges ────────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">13 · Challenges Faced &amp; Solutions</h2>
+    <table>
+      <tr><th>Challenge</th><th>Solution</th></tr>
+      <tr>
+        <td><strong>N+1 Query Problem</strong> — loading books list triggered a separate SQL query per book to fetch the author.</td>
+        <td>Added a <code>INNER JOIN FETCH</code> JPQL query (<code>findAllWithAuthor()</code>) in BookRepository so the author is loaded eagerly in one SQL statement.</td>
+      </tr>
+      <tr>
+        <td><strong>Author binding in Book form</strong> — the form submits only <code>author.id</code>, but JPA needs a managed Author entity.</td>
+        <td>The <code>BookServiceImpl.save()</code> method re-fetches the full Author entity from the repository using the submitted ID before calling <code>bookRepository.save()</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Duplicate constraint errors</strong> — H2 throws a low-level <code>DataIntegrityViolationException</code> when a duplicate email or ISBN is inserted, without a user-friendly message.</td>
+        <td>Caught in the controller's try-catch block and in <code>GlobalExceptionHandler</code>; a human-readable message is added to the model and the form is re-rendered.</td>
+      </tr>
+      <tr>
+        <td><strong>Reusing the same JSP form for Create and Update</strong> — the form action URL differs between the two operations.</td>
+        <td>Controllers pass a <code>formAction</code> string attribute to the model. The JSP's <code>&lt;form:form action="${formAction}"&gt;</code> uses this dynamically, so one template handles both cases.</td>
+      </tr>
+      <tr>
+        <td><strong>JPQL DTO projection</strong> — mapping a multi-table query result to a plain Java object without involving a full entity.</td>
+        <td>Used the JPQL <code>new com.bda.library.dto.BookWithAuthorDTO(...)</code> constructor expression, passing selected fields directly into the DTO constructor.</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ── 14. GitHub ─────────────────────────────────────────────────────── -->
+  <div class="section">
+    <h2 class="section-title">14 · GitHub Repository</h2>
+    <div class="link-box">https://github.com/himan0109/library-management-system</div>
+    <p>The repository contains the complete Maven project. To run locally:</p>
+    <pre>git clone https://github.com/himan0109/library-management-system.git
+cd library-management-system
+mvn spring-boot:run
+<span class="cm"># Open http://localhost:8080 in your browser</span></pre>
+    <p>To run all 32 unit tests:</p>
+    <pre>mvn test</pre>
+  </div>
+
+</div><!-- /page -->
+
+<footer>&copy; 2026 Library Management System — Built with Spring Boot 2.7 · JPA · JSP · H2</footer>
+</body>
+</html>

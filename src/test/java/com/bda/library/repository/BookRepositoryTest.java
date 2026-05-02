@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 class BookRepositoryTest {
 
-    @Autowired private BookRepository  bookRepository;
+    @Autowired private BookRepository   bookRepository;
     @Autowired private AuthorRepository authorRepository;
 
     private Author author;
@@ -24,12 +24,15 @@ class BookRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        author = authorRepository.save(Author.builder()
-                .name("George Orwell").email("go@test.com")
-                .nationality("British").birthYear(1903).build());
-        book = bookRepository.save(Book.builder()
-                .title("1984").isbn("978-0451524935")
-                .publishedYear(1949).genre("Dystopian Fiction").author(author).build());
+        Author a = new Author();
+        a.setName("George Orwell"); a.setEmail("go@test.com");
+        a.setNationality("British"); a.setBirthYear(1903);
+        author = authorRepository.save(a);
+
+        Book b = new Book();
+        b.setTitle("1984"); b.setIsbn("978-0451524935");
+        b.setPublishedYear(1949); b.setGenre("Dystopian Fiction"); b.setAuthor(author);
+        book = bookRepository.save(b);
     }
 
     @Test
@@ -64,10 +67,9 @@ class BookRepositoryTest {
     void findAllBooksWithAuthorDetails_returnsJoinResult() {
         List<BookWithAuthorDTO> dtos = bookRepository.findAllBooksWithAuthorDetails();
         assertThat(dtos).isNotEmpty();
-        BookWithAuthorDTO dto = dtos.get(0);
-        assertThat(dto.getTitle()).isEqualTo("1984");
-        assertThat(dto.getAuthorName()).isEqualTo("George Orwell");
-        assertThat(dto.getAuthorNationality()).isEqualTo("British");
+        assertThat(dtos.get(0).getTitle()).isEqualTo("1984");
+        assertThat(dtos.get(0).getAuthorName()).isEqualTo("George Orwell");
+        assertThat(dtos.get(0).getAuthorNationality()).isEqualTo("British");
     }
 
     @Test
@@ -81,7 +83,6 @@ class BookRepositoryTest {
     @Test
     @DisplayName("findByGenre() returns books matching genre")
     void findByGenre_returnsMatchingBooks() {
-        List<Book> books = bookRepository.findByGenre("Dystopian Fiction");
-        assertThat(books).hasSize(1);
+        assertThat(bookRepository.findByGenre("Dystopian Fiction")).hasSize(1);
     }
 }

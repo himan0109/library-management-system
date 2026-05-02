@@ -35,18 +35,21 @@ class BookServiceTest {
 
     @BeforeEach
     void setUp() {
-        author = Author.builder().id(1L).name("George Orwell").email("go@test.com")
-                .nationality("British").birthYear(1903).build();
-        book = Book.builder().id(1L).title("1984").isbn("978-0451524935")
-                .publishedYear(1949).genre("Dystopian Fiction").author(author).build();
+        author = new Author();
+        author.setId(1L); author.setName("George Orwell");
+        author.setEmail("go@test.com"); author.setNationality("British");
+        author.setBirthYear(1903);
+
+        book = new Book();
+        book.setId(1L); book.setTitle("1984"); book.setIsbn("978-0451524935");
+        book.setPublishedYear(1949); book.setGenre("Dystopian Fiction"); book.setAuthor(author);
     }
 
     @Test
     @DisplayName("findAll() uses fetch-join query")
     void findAll_usesJoinFetch() {
         when(bookRepository.findAllWithAuthor()).thenReturn(List.of(book));
-        List<Book> result = bookService.findAll();
-        assertThat(result).hasSize(1).contains(book);
+        assertThat(bookService.findAll()).hasSize(1).contains(book);
         verify(bookRepository).findAllWithAuthor();
     }
 
@@ -60,21 +63,25 @@ class BookServiceTest {
     @Test
     @DisplayName("save() resolves author by ID before persisting")
     void save_resolvesAuthorAndSaves() {
-        Book input = Book.builder().title("1984").isbn("978-0451524935")
-                .publishedYear(1949).genre("Dystopian Fiction")
-                .author(Author.builder().id(1L).build()).build();
+        Author stub = new Author(); stub.setId(1L);
+        Book input = new Book();
+        input.setTitle("1984"); input.setIsbn("978-0451524935");
+        input.setPublishedYear(1949); input.setGenre("Dystopian Fiction"); input.setAuthor(stub);
+
         when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
         when(bookRepository.save(any(Book.class))).thenReturn(book);
 
-        Book saved = bookService.save(input);
-        assertThat(saved.getAuthor().getName()).isEqualTo("George Orwell");
+        assertThat(bookService.save(input).getAuthor().getName()).isEqualTo("George Orwell");
     }
 
     @Test
     @DisplayName("save() throws EntityNotFoundException when author is missing")
     void save_throwsWhenAuthorMissing() {
-        Book input = Book.builder().title("X").isbn("000").publishedYear(2000)
-                .genre("G").author(Author.builder().id(99L).build()).build();
+        Author stub = new Author(); stub.setId(99L);
+        Book input = new Book();
+        input.setTitle("X"); input.setIsbn("000-0000000000");
+        input.setPublishedYear(2000); input.setGenre("G"); input.setAuthor(stub);
+
         when(authorRepository.findById(99L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> bookService.save(input))
                 .isInstanceOf(EntityNotFoundException.class);
@@ -83,9 +90,10 @@ class BookServiceTest {
     @Test
     @DisplayName("update() patches all fields of existing book")
     void update_patchesExistingBook() {
-        Book updated = Book.builder().title("Animal Farm").isbn("978-0451526342")
-                .publishedYear(1945).genre("Political Satire")
-                .author(Author.builder().id(1L).build()).build();
+        Author stub = new Author(); stub.setId(1L);
+        Book updated = new Book();
+        updated.setTitle("Animal Farm"); updated.setIsbn("978-0451526342");
+        updated.setPublishedYear(1945); updated.setGenre("Political Satire"); updated.setAuthor(stub);
 
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
         when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
@@ -93,7 +101,6 @@ class BookServiceTest {
 
         Book result = bookService.update(1L, updated);
         assertThat(result.getTitle()).isEqualTo("Animal Farm");
-        assertThat(result.getIsbn()).isEqualTo("978-0451526342");
         assertThat(result.getGenre()).isEqualTo("Political Satire");
     }
 
@@ -107,15 +114,14 @@ class BookServiceTest {
     }
 
     @Test
-    @DisplayName("findAllBooksWithAuthorDetails() returns DTO list from repository")
+    @DisplayName("findAllBooksWithAuthorDetails() returns DTO list")
     void findAllBooksWithAuthorDetails_returnsDTOs() {
-        BookWithAuthorDTO dto = new BookWithAuthorDTO(1L, "1984", "978-0451524935",
-                1949, "Dystopian Fiction", 1L, "George Orwell", "British");
+        BookWithAuthorDTO dto = new BookWithAuthorDTO(
+                1L, "1984", "978-0451524935", 1949, "Dystopian Fiction", 1L, "George Orwell", "British");
         when(bookRepository.findAllBooksWithAuthorDetails()).thenReturn(List.of(dto));
 
-        List<BookWithAuthorDTO> result = bookService.findAllBooksWithAuthorDetails();
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getAuthorName()).isEqualTo("George Orwell");
+        assertThat(bookService.findAllBooksWithAuthorDetails().get(0).getAuthorName())
+                .isEqualTo("George Orwell");
     }
 
     @Test

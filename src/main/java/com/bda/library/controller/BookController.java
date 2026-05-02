@@ -1,10 +1,9 @@
 package com.bda.library.controller;
 
-import com.bda.library.entity.Author;
 import com.bda.library.entity.Book;
+import com.bda.library.entity.Author;
 import com.bda.library.service.AuthorService;
 import com.bda.library.service.BookService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,31 +12,31 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 @RequestMapping("/books")
-@RequiredArgsConstructor
 public class BookController {
 
     private final BookService bookService;
     private final AuthorService authorService;
 
-    // ── READ: list all books ──────────────────────────────────────────────────
+    public BookController(BookService bookService, AuthorService authorService) {
+        this.bookService = bookService;
+        this.authorService = authorService;
+    }
+
     @GetMapping
     public String list(Model model) {
         model.addAttribute("books", bookService.findAll());
         return "books/list";
     }
 
-    // ── READ: inner-join view ─────────────────────────────────────────────────
     @GetMapping("/joined")
     public String joinedView(Model model) {
         model.addAttribute("joinedBooks", bookService.findAllBooksWithAuthorDetails());
         return "books/joined";
     }
 
-    // ── CREATE: show form ─────────────────────────────────────────────────────
     @GetMapping("/new")
     public String newBookForm(Model model) {
         model.addAttribute("book", new Book());
@@ -47,7 +46,6 @@ public class BookController {
         return "books/form";
     }
 
-    // ── CREATE: handle submission ─────────────────────────────────────────────
     @PostMapping
     public String createBook(@Valid @ModelAttribute("book") Book book,
                              BindingResult bindingResult,
@@ -72,7 +70,6 @@ public class BookController {
         return "redirect:/books";
     }
 
-    // ── UPDATE: show pre-filled form ──────────────────────────────────────────
     @GetMapping("/{id}/edit")
     public String editBookForm(@PathVariable Long id, Model model) {
         Book book = bookService.findById(id)
@@ -84,7 +81,6 @@ public class BookController {
         return "books/form";
     }
 
-    // ── UPDATE: handle submission ─────────────────────────────────────────────
     @PostMapping("/{id}/update")
     public String updateBook(@PathVariable Long id,
                              @Valid @ModelAttribute("book") Book book,

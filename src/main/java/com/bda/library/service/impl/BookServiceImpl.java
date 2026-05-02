@@ -6,7 +6,6 @@ import com.bda.library.entity.Book;
 import com.bda.library.repository.AuthorRepository;
 import com.bda.library.repository.BookRepository;
 import com.bda.library.service.BookService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +14,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+
+    public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository) {
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+    }
 
     @Override
     @Transactional(readOnly = true)

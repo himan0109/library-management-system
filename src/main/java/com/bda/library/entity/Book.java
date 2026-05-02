@@ -1,19 +1,10 @@
 package com.bda.library.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 @Entity
 @Table(name = "books")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Book {
 
     @Id
@@ -44,4 +35,33 @@ public class Book {
     @JoinColumn(name = "author_id", nullable = false)
     @NotNull(message = "Author is required")
     private Author author;
+
+    public Book() {}
+
+    public Book(Long id, String title, String isbn, int publishedYear, String genre, Author author) {
+        this.id = id;
+        this.title = title;
+        this.isbn = isbn;
+        this.publishedYear = publishedYear;
+        this.genre = genre;
+        this.author = author;
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public int getPublishedYear() { return publishedYear; }
+    public void setPublishedYear(int publishedYear) { this.publishedYear = publishedYear; }
+
+    public String getGenre() { return genre; }
+    public void setGenre(String genre) { this.genre = genre; }
+
+    public Author getAuthor() { return author; }
+    public void setAuthor(Author author) { this.author = author; }
 }

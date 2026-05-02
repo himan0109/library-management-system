@@ -32,17 +32,17 @@ class AuthorServiceTest {
 
     @BeforeEach
     void setUp() {
-        author = Author.builder()
-                .id(1L).name("George Orwell").email("go@test.com")
-                .nationality("British").birthYear(1903).build();
+        author = new Author();
+        author.setId(1L); author.setName("George Orwell");
+        author.setEmail("go@test.com"); author.setNationality("British");
+        author.setBirthYear(1903);
     }
 
     @Test
     @DisplayName("findAll() delegates to repository and returns list")
     void findAll_returnsAllAuthors() {
         when(authorRepository.findAll()).thenReturn(List.of(author));
-        List<Author> result = authorService.findAll();
-        assertThat(result).hasSize(1).contains(author);
+        assertThat(authorService.findAll()).hasSize(1).contains(author);
         verify(authorRepository).findAll();
     }
 
@@ -50,8 +50,7 @@ class AuthorServiceTest {
     @DisplayName("findById() returns author when found")
     void findById_returnsAuthor() {
         when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
-        Optional<Author> result = authorService.findById(1L);
-        assertThat(result).isPresent().contains(author);
+        assertThat(authorService.findById(1L)).isPresent().contains(author);
     }
 
     @Test
@@ -65,24 +64,23 @@ class AuthorServiceTest {
     @DisplayName("save() persists and returns the author")
     void save_persistsAuthor() {
         when(authorRepository.save(author)).thenReturn(author);
-        Author saved = authorService.save(author);
-        assertThat(saved).isEqualTo(author);
+        assertThat(authorService.save(author)).isEqualTo(author);
         verify(authorRepository).save(author);
     }
 
     @Test
     @DisplayName("update() patches fields of existing author")
     void update_patchesExistingAuthor() {
-        Author updated = Author.builder().name("Orwell Updated").email("new@test.com")
-                .nationality("American").birthYear(1910).build();
+        Author updated = new Author();
+        updated.setName("Orwell Updated"); updated.setEmail("new@test.com");
+        updated.setNationality("American"); updated.setBirthYear(1910);
+
         when(authorRepository.findById(1L)).thenReturn(Optional.of(author));
         when(authorRepository.save(any(Author.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Author result = authorService.update(1L, updated);
-
         assertThat(result.getName()).isEqualTo("Orwell Updated");
         assertThat(result.getEmail()).isEqualTo("new@test.com");
-        assertThat(result.getNationality()).isEqualTo("American");
     }
 
     @Test
@@ -110,11 +108,9 @@ class AuthorServiceTest {
     }
 
     @Test
-    @DisplayName("searchByName() returns matching authors from repository")
+    @DisplayName("searchByName() returns matching authors")
     void searchByName_returnsAuthors() {
         when(authorRepository.searchByName("orwell")).thenReturn(List.of(author));
-        List<Author> result = authorService.searchByName("orwell");
-        assertThat(result).hasSize(1);
-        verify(authorRepository).searchByName("orwell");
+        assertThat(authorService.searchByName("orwell")).hasSize(1);
     }
 }

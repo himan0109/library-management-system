@@ -1,10 +1,5 @@
 package com.bda.library.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.ArrayList;
@@ -12,10 +7,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "authors")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Author {
 
     @Id
@@ -44,4 +35,32 @@ public class Author {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books = new ArrayList<>();
+
+    public Author() {}
+
+    public Author(Long id, String name, String email, String nationality, int birthYear) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.nationality = nationality;
+        this.birthYear = birthYear;
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getNationality() { return nationality; }
+    public void setNationality(String nationality) { this.nationality = nationality; }
+
+    public int getBirthYear() { return birthYear; }
+    public void setBirthYear(int birthYear) { this.birthYear = birthYear; }
+
+    public List<Book> getBooks() { return books; }
+    public void setBooks(List<Book> books) { this.books = books; }
 }
